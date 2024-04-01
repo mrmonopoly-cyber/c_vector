@@ -52,3 +52,4 @@ void c_vector_to_string(const c_vector* list);
 
 unsigned int c_vector_length(const c_vector* list);
 unsigned int c_vector_capacity(const c_vector* list);
+unsigned int c_vector_ele_size(const c_vector* list);

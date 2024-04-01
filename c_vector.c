@@ -253,3 +253,9 @@ unsigned int c_vector_capacity(const c_vector* list){
         
     return list->metadata->_capacity;
 }
+
+unsigned int c_vector_ele_size(const c_vector* list){
+    if (!input_valid_pointer(list, "list")) return NULL_REFERENCE_LIST;
+
+    return list->metadata->_ele_size;
+}
