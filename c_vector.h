@@ -33,7 +33,7 @@ c_vector_free(c_vector* list);
 int 
 c_vector_insert_in(c_vector** list, const void* ele, const unsigned int index);
 
-int
+const void*
 c_vector_push(c_vector** list, const void* ele);
 
 int
@@ -52,3 +52,4 @@ void c_vector_to_string(const c_vector* list);
 
 unsigned int c_vector_length(const c_vector* list);
 unsigned int c_vector_capacity(const c_vector* list);
+unsigned int c_vector_ele_size(const c_vector* list);

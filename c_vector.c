@@ -107,12 +107,12 @@ c_vector_init(const struct c_vector_input_init* input_args)
     return new_vector;
 }
 
-int 
+const void*
 c_vector_push(c_vector** list, const void* ele)
 {
-    if(!c_check_input_pointer(list, "vector root pointer")) return NULL_REFERENCE_LIST;
-    if(!c_check_input_pointer(list, "vector pointer")) return NULL_REFERENCE_LIST;
-    if(!c_check_input_pointer(list, "vector element to push")) return NULL_REFERENCE_LIST;
+    if(!c_check_input_pointer(list, "vector root pointer")) return NULL;
+    if(!c_check_input_pointer(list, "vector pointer")) return NULL;
+    if(!c_check_input_pointer(list, "vector element to push")) return NULL;
     
     if ((*list)->metadata->_length == (*list)->metadata->_capacity) {
         resize_list(list);
@@ -123,7 +123,7 @@ c_vector_push(c_vector** list, const void* ele)
     memcpy(data + offset, ele, (*list)->metadata->_ele_size);
     (*list)->metadata->_length++;
 
-    return EXIT_SUCCESS;
+    return data + offset;
 }
 
 int 
@@ -236,4 +236,10 @@ unsigned int c_vector_capacity(const c_vector* list){
     if(!c_check_input_pointer(list, "vector pointer")) return NULL_REFERENCE_LIST;
         
     return list->metadata->_capacity;
+}
+
+unsigned int c_vector_ele_size(const c_vector* list){
+    if(!c_check_input_pointer(list, "vector pointer")) return NULL_REFERENCE_LIST;
+
+    return list->metadata->_ele_size;
 }
