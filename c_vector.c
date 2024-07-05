@@ -161,18 +161,20 @@ c_vector_find(const c_vector* list, const void* ele, void* o_result)
     return EXIT_SUCCESS;
 }
 
-void* 
-c_vector_get_at_index(const c_vector* list, const unsigned int index)
+int 
+c_vector_get_at_index(const c_vector* list, const unsigned int index, void* o_result)
 {
-    if(!c_check_input_pointer(list, "vector pointer")) return NULL;
+    if(!c_check_input_pointer(list, "vector pointer")) return EXIT_FAILURE;
     if (!c_check_input_index(index,"vector length",0,list->metadata->_length)) {
-        return NULL;
+        return EXIT_FAILURE;
     }
     
     void *data = get_data(list);
     unsigned int offset = get_offset(list, index);
 
-    return data + offset;
+    o_result = data + offset;
+
+    return EXIT_SUCCESS;
 }
 
 int

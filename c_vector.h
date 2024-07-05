@@ -39,8 +39,8 @@ c_vector_push(c_vector** list, const void* ele);
 int
 c_vector_find(const c_vector* list, const void* ele, void* o_result);
 
-void*
-c_vector_get_at_index(const c_vector* list, const unsigned int index);
+int
+c_vector_get_at_index(const c_vector* list, const unsigned int index, void* o_result);
 
 int
 c_vector_delete_ele(c_vector* list, const void *ele);
