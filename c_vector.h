@@ -36,8 +36,8 @@ c_vector_insert_in(c_vector** list, const void* ele, const unsigned int index);
 const void*
 c_vector_push(c_vector** list, const void* ele);
 
-int
-c_vector_find(const c_vector* list, const void* ele, void* o_result);
+void*
+c_vector_find(const c_vector* list, const void* ele);
 
 void*
 c_vector_get_at_index(const c_vector* list, const unsigned int index);

@@ -141,13 +141,12 @@ c_vector_insert_in(c_vector** list, const void* ele, const unsigned int index)
     return EXIT_SUCCESS;
 }
 
-int
-c_vector_find(const c_vector* list, const void* ele, void* o_result)
+void*
+c_vector_find(const c_vector* list, const void* ele)
 {
-    if(!c_check_input_pointer(list, "vector pointer")) return NULL_REFERENCE_LIST;
-    if(!c_check_input_pointer(list, "vector element to find")) return NULL_REFERENCE_LIST;
+    if(!c_check_input_pointer(list, "vector pointer")) return NULL;
+    if(!c_check_input_pointer(list, "vector element to find")) return NULL;
 
-    o_result=NULL;
     void *data = get_data(list);
     unsigned int ele_size = list->metadata->_ele_size;
     void *list_ele = 0;
@@ -155,10 +154,10 @@ c_vector_find(const c_vector* list, const void* ele, void* o_result)
     for (unsigned int i=0; i<list->metadata->_length; i++) {
         list_ele = data + (i*ele_size);
         if (list->metadata->_cmp(list_ele, ele)) {
-            o_result = list_ele;
+            return list_ele;
         }
     }
-    return EXIT_SUCCESS;
+    return NULL;
 }
 
 void* 
