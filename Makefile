@@ -1,4 +1,4 @@
-C_FLAGS =-Wall -Wextra  -fsanitize=address -g
+C_FLAGS =-Wall -Wextra  -fsanitize=address -g -fPIC
 
 c_vector_src_path := $(or $(C_VECTOR_ROOT), .)
 c_vector.c := $(c_vector_src_path)/c_vector.c
