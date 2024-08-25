@@ -1,3 +1,1 @@
-main
-c_vector.o
-*.so
+*.o
