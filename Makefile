@@ -1,6 +1,9 @@
 CC = gcc
-C_FLAGS =-Wall -Wextra -g
-C_EXFLAGS = ""
+C_FLAGS =-Wall -Wextra
+C_EXFLAGS =
+
+DEBUG_FLAGS = -O0 -fsanitize=address -g
+RELEASE_FLAGS = -O2
 
 c_vector_src_path := $(or $(C_VECTOR_ROOT), .)
 c_vector.c := $(c_vector_src_path)/c_vector.c
