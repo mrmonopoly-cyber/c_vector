@@ -42,6 +42,8 @@ int c_vector_delete_ele_at_index(c_vector *list, const unsigned int index);
 
 void c_vector_to_string(const c_vector *list);
 
+void c_vector_clear(c_vector *list);
+
 unsigned int c_vector_length(const c_vector *list);
 unsigned int c_vector_capacity(const c_vector *list);
 unsigned int c_vector_ele_size(const c_vector *list);

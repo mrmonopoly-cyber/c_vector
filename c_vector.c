@@ -219,6 +219,11 @@ void c_vector_to_string(const c_vector *list) {
   c_vector_foreach(list, list->metadata->_print);
 }
 
+void c_vector_clear(c_vector *list)
+{
+    list->metadata->_length = 0;
+}
+
 unsigned int c_vector_length(const c_vector *list) {
   if (!c_check_input_pointer(list, "vector pointer"))
     return NULL_REFERENCE_LIST;
