@@ -2,7 +2,7 @@
 
 typedef struct c_vector c_vector;
 typedef int (*comp_fun)(const void* list_ele, const void* key);
-typedef void (*free_ele)(void* ele);
+typedef void (*free_ele)(const void* ele);
 typedef void (*print_ele)(const void* ele);
 
 #define DEFAULT_CAPACITY 10
@@ -24,8 +24,8 @@ struct c_vector_input_init{
     free_ele free_fun;
 };
 
-c_vector* 
-c_vector_init(const struct c_vector_input_init* input_args);
+int 
+c_vector_init(const struct c_vector_input_init* input_args, c_vector** o_res);
 
 int 
 c_vector_free(c_vector* list);
@@ -33,14 +33,14 @@ c_vector_free(c_vector* list);
 int 
 c_vector_insert_in(c_vector** list, const void* ele, const unsigned int index);
 
-const void*
-c_vector_push(c_vector** list, const void* ele);
+int
+c_vector_push(c_vector** list, const void* ele, void** o_res);
 
 int
-c_vector_find(const c_vector* list, const void* ele, void* o_result);
+c_vector_find(const c_vector* list, const void* ele, const void* o_result);
 
-void*
-c_vector_get_at_index(const c_vector* list, const unsigned int index);
+int
+c_vector_get_at_index(const c_vector* list, const unsigned int index, const void** o_res);
 
 int
 c_vector_delete_ele(c_vector* list, const void *ele);

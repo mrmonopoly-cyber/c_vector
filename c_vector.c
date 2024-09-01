@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lib/c_input_check/c_check_input.h"
-
 struct c_vector_metadata {
   unsigned int _capacity;
   unsigned int _length;
@@ -20,9 +18,12 @@ struct c_vector {
   char data[];
 };
 
+#define c_check_input_pointer(PTR,MSG) \
+    if (!PTR) {printf("invalid input: "MSG); return EXIT_FAILURE;}
+
 #define c_vector_foreach(LIST, FUN)                                            \
   for (unsigned int i = 0; i < LIST->metadata->_length; i++) {                 \
-    void *data = LIST->data;                                                   \
+    const void *data = LIST->data;                                                   \
     unsigned int offset = get_offset(LIST, i);                                 \
     FUN(data + offset);                                                        \
   }
@@ -69,21 +70,20 @@ static int resize_list(c_vector **list) {
 }
 
 // public
-c_vector *c_vector_init(const struct c_vector_input_init *input_args) {
+int
+c_vector_init(const struct c_vector_input_init* input_args, c_vector** o_res)
+{
   unsigned int ele_size = input_args->ele_size;
   int capacity = input_args->capacity;
   if (!ele_size) {
     fprintf(stderr, "FAILED: invalid element size, at least > 0, given %d\n",
             ele_size);
-    return NULL;
+    return EXIT_FAILURE;
   }
 
-  if (!c_check_input_pointer(input_args->found_f, "found_f"))
-    return NULL;
-  if (!c_check_input_pointer(input_args->free_fun, "free_fun"))
-    return NULL;
-  if (!c_check_input_pointer(input_args->print_fun, "print_fun"))
-    return NULL;
+  c_check_input_pointer(input_args->found_f, "found_f");
+  c_check_input_pointer(input_args->free_fun, "free_fun");
+  c_check_input_pointer(input_args->print_fun, "print_fun");
 
   unsigned int vec_cap = capacity < 0 ? DEFAULT_CAPACITY : capacity;
   c_vector *new_vector =
@@ -91,21 +91,21 @@ c_vector *c_vector_init(const struct c_vector_input_init *input_args) {
 
   if (!new_vector) {
     fprintf(stderr, "PANIC, not enough memory to alloc the list\n");
-    return NULL;
+    return EXIT_FAILURE;
   }
 
   init_metadata(new_vector, input_args);
 
-  return new_vector;
+  (*o_res) = new_vector;
+
+  return EXIT_SUCCESS;
 }
 
-const void *c_vector_push(c_vector **list, const void *ele) {
-  if (!c_check_input_pointer(list, "vector root pointer"))
-    return NULL;
-  if (!c_check_input_pointer(list, "vector pointer"))
-    return NULL;
-  if (!c_check_input_pointer(list, "vector element to push"))
-    return NULL;
+int c_vector_push(c_vector** list, const void* ele, void** o_res)
+{
+  c_check_input_pointer(list, "vector root pointer");
+  c_check_input_pointer(list, "vector pointer");
+  c_check_input_pointer(list, "vector element to push");
 
   if ((*list)->metadata->_length == (*list)->metadata->_capacity) {
     resize_list(list);
@@ -116,15 +116,16 @@ const void *c_vector_push(c_vector **list, const void *ele) {
   memcpy(data + offset, ele, (*list)->metadata->_ele_size);
   (*list)->metadata->_length++;
 
-  return data + offset;
+  if (o_res) {
+      (*o_res) = data + offset;
+  }
+  return EXIT_SUCCESS;
 }
 
 int c_vector_insert_in(c_vector **list, const void *ele,
                        const unsigned int index) {
-  if (!c_check_input_pointer(list, "vector pointer"))
-    return NULL_REFERENCE_LIST;
-  if (!c_check_input_pointer(list, "vector element to insert"))
-    return NULL_REFERENCE_LIST;
+  c_check_input_pointer(list, "vector pointer");
+  c_check_input_pointer(list, "vector element to insert");
 
   if (index > (*list)->metadata->_capacity)
     resize_list(list);
@@ -135,16 +136,14 @@ int c_vector_insert_in(c_vector **list, const void *ele,
   return EXIT_SUCCESS;
 }
 
-int c_vector_find(const c_vector *list, const void *ele, void *o_result) {
-  if (!c_check_input_pointer(list, "vector pointer"))
-    return NULL_REFERENCE_LIST;
-  if (!c_check_input_pointer(list, "vector element to find"))
-    return NULL_REFERENCE_LIST;
+int c_vector_find(const c_vector *list, const void *ele, const void *o_result) {
+  c_check_input_pointer(list, "vector pointer");
+  c_check_input_pointer(list, "vector element to find");
 
   o_result = NULL;
-  void *data = list->data;
+  const void *data = list->data;
   unsigned int ele_size = list->metadata->_ele_size;
-  void *list_ele = 0;
+  const void *list_ele = 0;
 
   for (unsigned int i = 0; i < list->metadata->_length; i++) {
     list_ele = data + (i * ele_size);
@@ -155,25 +154,27 @@ int c_vector_find(const c_vector *list, const void *ele, void *o_result) {
   return EXIT_SUCCESS;
 }
 
-void *c_vector_get_at_index(const c_vector *list, const unsigned int index) {
-  if (!c_check_input_pointer(list, "vector pointer"))
-    return NULL;
-  if (!c_check_input_index(index, "vector length", 0,
-                           list->metadata->_length)) {
-    return NULL;
+int
+c_vector_get_at_index(const c_vector* list, const unsigned int index, const void** o_res)
+{
+  c_check_input_pointer(list, "vector pointer");
+  c_check_input_pointer(o_res, "out ptr");
+
+  if (list->metadata->_length < index) {
+    printf("invalid input: vector length\n");
+    return EXIT_FAILURE;
   }
 
-  void *data = list->data;
+  const void *data = list->data;
   unsigned int offset = get_offset(list, index);
 
-  return data + offset;
+  *o_res = data + offset;
+  return EXIT_SUCCESS;
 }
 
 int c_vector_delete_ele(c_vector *list, const void *ele) {
-  if (!c_check_input_pointer(list, "vector pointer"))
-    return NULL_REFERENCE_LIST;
-  if (!c_check_input_pointer(ele, "vector element to delete"))
-    return NULL_REFERENCE_LIST;
+  c_check_input_pointer(list, "vector pointer");
+  c_check_input_pointer(ele, "vector element to delete");
 
   unsigned int i = 0;
   void *data = list->data;
@@ -192,11 +193,11 @@ int c_vector_delete_ele(c_vector *list, const void *ele) {
 }
 
 int c_vector_delete_ele_at_index(c_vector *list, const unsigned int index) {
-  if (!c_check_input_pointer(list, "vector pointer"))
-    return NULL_REFERENCE_LIST;
-  if (!c_check_input_index(index, "vector length", 0,
-                           list->metadata->_length)) {
-    return INVALID_INDEX_VALUE;
+  c_check_input_pointer(list, "vector pointer");
+
+  if (list->metadata->_length < index) {
+    printf("invalid input: vector length\n");
+    return EXIT_FAILURE;
   }
 
   void *data = list->data;
@@ -208,8 +209,8 @@ int c_vector_delete_ele_at_index(c_vector *list, const unsigned int index) {
 }
 
 int c_vector_free(c_vector *list) {
-  if (!c_check_input_pointer(list, "vector pointer"))
-    return NULL_REFERENCE_LIST;
+  c_check_input_pointer(list, "vector pointer");
+
   c_vector_foreach(list, list->metadata->_free);
   free(list->metadata);
   free(list);
@@ -221,22 +222,20 @@ void c_vector_to_string(const c_vector *list) {
 }
 
 unsigned int c_vector_length(const c_vector *list) {
-  if (!c_check_input_pointer(list, "vector pointer"))
+  c_check_input_pointer(list, "vector pointer");
     return NULL_REFERENCE_LIST;
 
   return list->metadata->_length;
 }
 
 unsigned int c_vector_capacity(const c_vector *list) {
-  if (!c_check_input_pointer(list, "vector pointer"))
-    return NULL_REFERENCE_LIST;
+  c_check_input_pointer(list, "vector pointer");
 
   return list->metadata->_capacity;
 }
 
 unsigned int c_vector_ele_size(const c_vector *list) {
-  if (!c_check_input_pointer(list, "vector pointer"))
-    return NULL_REFERENCE_LIST;
+  c_check_input_pointer(list, "vector pointer");
 
   return list->metadata->_ele_size;
 }
