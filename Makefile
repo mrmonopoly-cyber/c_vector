@@ -8,11 +8,6 @@ RELEASE_FLAGS = -O2
 c_vector_src_path := $(or $(C_VECTOR_ROOT), .)
 c_vector.c := $(c_vector_src_path)/c_vector.c
 
-ifndef $(C_CHECK_INPUT_ROOT)
-C_CHECK_INPUT_ROOT := $(c_vector_src_path)/lib/c_input_check
-include $(C_CHECK_INPUT_ROOT)/Makefile
-endif
-
 all: release
 
 debug: C_FLAGS += $(DEBUG_FLAGS)

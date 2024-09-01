@@ -4,7 +4,7 @@ C_VECTOR_ROOT = ..
 
 include $(C_VECTOR_ROOT)/Makefile
 
-OBJ_FILE = c_vector.o c_check_input.o
+OBJ_FILE = c_vector.o
 
 all: main
 
