@@ -32,15 +32,15 @@ int c_vector_insert_in(c_vector **list, const void *ele,
 
 const void *c_vector_push(c_vector **list, const void *ele);
 
-void *c_vector_find(const c_vector *list, const void *ele);
+void *c_vector_find(c_vector *list, const void *ele);
 
-void *c_vector_get_at_index(const c_vector *list, const unsigned int index);
+void *c_vector_get_at_index(c_vector *list, const unsigned int index);
 
 int c_vector_delete_ele(c_vector *list, const void *ele);
 
 int c_vector_delete_ele_at_index(c_vector *list, const unsigned int index);
 
-void c_vector_to_string(const c_vector *list);
+void c_vector_to_string(c_vector *list);
 
 unsigned int c_vector_length(const c_vector *list);
 unsigned int c_vector_capacity(const c_vector *list);

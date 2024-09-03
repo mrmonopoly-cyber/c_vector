@@ -24,8 +24,8 @@ struct c_vector {
     return RET;                                                                \
   }
 
-#define c_check_input_index(IDX, MSG, MIN, MAX, RET)                           \
-  if (index < MIN || index > MAX)                                              \
+#define c_check_input_index(IDX, MSG, MAX, RET)                                \
+  if (index > MAX)                                                             \
     return RET;
 
 #define c_vector_foreach(LIST, FUN)                                            \
@@ -136,7 +136,7 @@ int c_vector_insert_in(c_vector **list, const void *ele,
   return EXIT_SUCCESS;
 }
 
-void *c_vector_find(const c_vector *list, const void *ele) {
+void *c_vector_find(c_vector *list, const void *ele) {
   c_check_input_pointer(list, "vector pointer", NULL);
   c_check_input_pointer(list, "vector element to find", NULL);
 
@@ -153,9 +153,9 @@ void *c_vector_find(const c_vector *list, const void *ele) {
   return NULL;
 }
 
-void *c_vector_get_at_index(const c_vector *list, const unsigned int index) {
+void *c_vector_get_at_index(c_vector *list, const unsigned int index) {
   c_check_input_pointer(list, "vector pointer", NULL);
-  c_check_input_index(index, "vector length", 0, list->metadata->_length, NULL);
+  c_check_input_index(index, "vector length", list->metadata->_length, NULL);
 
   void *data = list->data;
   unsigned int offset = get_offset(list, index);
@@ -185,7 +185,7 @@ int c_vector_delete_ele(c_vector *list, const void *ele) {
 
 int c_vector_delete_ele_at_index(c_vector *list, const unsigned int index) {
   c_check_input_pointer(list, "vector pointer", EXIT_FAILURE);
-  c_check_input_index(index, "vector length", 0, list->metadata->_length,
+  c_check_input_index(index, "vector length", list->metadata->_length,
                       EXIT_FAILURE);
 
   void *data = list->data;
@@ -204,7 +204,7 @@ int c_vector_free(c_vector *list) {
   return EXIT_SUCCESS;
 }
 
-void c_vector_to_string(const c_vector *list) {
+void c_vector_to_string(c_vector *list) {
   c_check_input_pointer(list, "vector pointer", );
   c_vector_foreach(list, list->metadata->_print);
 }
@@ -230,4 +230,6 @@ unsigned int c_vector_ele_size(const c_vector *list) {
 unsigned int c_vector_clear(const c_vector *list) {
   c_check_input_pointer(list, "vector pointer", EXIT_FAILURE);
   list->metadata->_length = 0;
+
+  return EXIT_SUCCESS;
 }
