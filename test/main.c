@@ -23,15 +23,12 @@ int main(void) {
       .free_fun = free_char,
       .print_fun = print_char,
   };
-  c_vector *t = NULL;
-  if(c_vector_init(&args,&t)){
-      return EXIT_FAILURE;
-  }
+  c_vector *t = c_vector_init(&args);
 
   int a = 'a';
   for (char i = 0; i < 13; i++) {
     printf("inserting %d\n", a);
-    c_vector_push(&t, &a,NULL);
+    c_vector_push(&t, &a);
     a++;
   }
 
