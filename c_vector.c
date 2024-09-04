@@ -5,9 +5,9 @@
 #include <string.h>
 
 struct c_vector_metadata {
-  unsigned int _capacity;
-  unsigned int _length;
-  unsigned int _ele_size;
+  uint8_t _capacity;
+  uint8_t _length;
+  uint8_t _ele_size;
   free_ele _free;
   print_ele _print;
   comp_fun _cmp_fun;
