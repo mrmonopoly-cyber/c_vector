@@ -29,15 +29,15 @@ struct c_vector {
     return RET;
 
 #define c_vector_foreach(LIST, FUN)                                            \
-  for (unsigned int i = 0; i < LIST->metadata->_length; i++) {                 \
+  for (uint8_t i = 0; i < LIST->metadata->_length; i++) {                      \
     char *data = LIST->data;                                                   \
-    unsigned int offset = get_offset(LIST, i);                                 \
+    uint8_t offset = get_offset(LIST, i);                                      \
     FUN(&data[offset]);                                                        \
   }
 
 // private
-inline static unsigned int get_offset(const struct c_vector *list,
-                                      const unsigned int position) {
+inline static uint8_t get_offset(const struct c_vector *list,
+                                 const uint8_t position) {
   return list->metadata->_ele_size * position;
 }
 
@@ -59,8 +59,8 @@ static int init_metadata(struct c_vector *list,
 
 static int resize_list(struct c_vector **list) {
   char *data = NULL;
-  unsigned int old_capacity = (*list)->metadata->_capacity;
-  unsigned int new_capacity = old_capacity * 2;
+  uint8_t old_capacity = (*list)->metadata->_capacity;
+  uint8_t new_capacity = old_capacity * 2;
   struct c_vector *new_list = realloc(
       (*list), sizeof(**list) + (new_capacity * (*list)->metadata->_ele_size));
   if (!new_list) {
@@ -76,11 +76,11 @@ static int resize_list(struct c_vector **list) {
   return EXIT_SUCCESS;
 }
 
-static int delete_shift(struct c_vector *list, unsigned int start_index) {
-  unsigned int offset_i = get_offset(list, start_index);
-  unsigned int offset_j = 0;
+static int delete_shift(struct c_vector *list, uint8_t start_index) {
+  uint8_t offset_i = get_offset(list, start_index);
+  uint8_t offset_j = 0;
   char *data = list->data;
-  for (unsigned int j = start_index + 1; j < list->metadata->_length; j++) {
+  for (uint8_t j = start_index + 1; j < list->metadata->_length; j++) {
     offset_j = get_offset(list, j);
     memcpy(&data[offset_i], &data[offset_j], list->metadata->_ele_size);
     start_index++;
@@ -91,9 +91,9 @@ static int delete_shift(struct c_vector *list, unsigned int start_index) {
 
 static void *get_element(struct c_vector *list, const void *key) {
   char *data = list->data;
-  unsigned int offset = 0;
+  uint8_t offset = 0;
 
-  for (unsigned int i = 0; i < list->metadata->_length; i++) {
+  for (uint8_t i = 0; i < list->metadata->_length; i++) {
     offset = get_offset(list, i);
     if (list->metadata->_cmp_fun) {
       if (!list->metadata->_cmp_fun(&data[offset], key)) {
@@ -112,7 +112,7 @@ c_vector_h c_vector_init(const struct c_vector_input_init *input_args) {
   c_check_input_pointer(input_args->free_fun, "free_fun", NULL);
   c_check_input_pointer(input_args->print_fun, "print_fun", NULL);
 
-  unsigned int ele_size = input_args->ele_size;
+  uint8_t ele_size = input_args->ele_size;
   int capacity = input_args->capacity;
   if (!ele_size) {
     fprintf(stderr, "FAILED: invalid element size, at least > 0, given %d\n",
@@ -120,7 +120,7 @@ c_vector_h c_vector_init(const struct c_vector_input_init *input_args) {
     return NULL;
   }
 
-  unsigned int vec_cap = capacity < 0 ? DEFAULT_CAPACITY : capacity;
+  uint8_t vec_cap = capacity < 0 ? DEFAULT_CAPACITY : capacity;
   struct c_vector *new_vector =
       calloc(1, sizeof(*new_vector) + (vec_cap * ele_size) + 100);
 
@@ -145,7 +145,7 @@ const void *c_vector_push(c_vector_h *list, const void *ele) {
     *list = list_a;
   }
 
-  unsigned int offset = get_offset(list_a, list_a->metadata->_length);
+  uint8_t offset = get_offset(list_a, list_a->metadata->_length);
   char *data = list_a->data;
   memcpy(&data[offset], ele, list_a->metadata->_ele_size);
   list_a->metadata->_length++;
@@ -154,7 +154,7 @@ const void *c_vector_push(c_vector_h *list, const void *ele) {
 }
 
 uint8_t c_vector_insert_in(c_vector_h *list, const void *ele,
-                           const unsigned int index) {
+                           const uint8_t index) {
   c_check_input_pointer(list, "vector pointer", EXIT_FAILURE);
   struct c_vector *list_a = *list;
   c_check_input_pointer(ele, "vector element to insert", EXIT_FAILURE);
@@ -162,7 +162,7 @@ uint8_t c_vector_insert_in(c_vector_h *list, const void *ele,
   if (index > list_a->metadata->_capacity)
     resize_list(&list_a);
 
-  unsigned int offset = (index * list_a->metadata->_ele_size);
+  uint8_t offset = (index * list_a->metadata->_ele_size);
   char *data = list_a->data;
   memcpy(&data[offset], ele, list_a->metadata->_ele_size);
   return EXIT_SUCCESS;
@@ -174,13 +174,13 @@ void *c_vector_find(c_vector_h list, const void *ele) {
   return get_element(list, ele);
 }
 
-void *c_vector_get_at_index(c_vector_h list, const unsigned int index) {
+void *c_vector_get_at_index(c_vector_h list, const uint8_t index) {
   c_check_input_pointer(list, "vector pointer", NULL);
   struct c_vector *list_a = list;
   c_check_input_index(index, "vector length", list_a->metadata->_length, NULL);
 
   char *data = list_a->data;
-  unsigned int offset = get_offset(list_a, index);
+  uint8_t offset = get_offset(list_a, index);
 
   return &data[offset];
 }
@@ -190,9 +190,9 @@ uint8_t c_vector_delete_ele(c_vector_h list, const void *ele) {
   c_check_input_pointer(list_a, "vector pointer", EXIT_FAILURE);
   c_check_input_pointer(ele, "vector element to delete", EXIT_FAILURE);
 
-  unsigned int i = 0;
+  uint8_t i = 0;
   char *data = list_a->data;
-  unsigned int offset_i = 0;
+  uint8_t offset_i = 0;
 
   for (; i < list_a->metadata->_length; i++) {
     offset_i = get_offset(list_a, i);
@@ -207,15 +207,14 @@ uint8_t c_vector_delete_ele(c_vector_h list, const void *ele) {
   return EXIT_FAILURE;
 }
 
-uint8_t c_vector_delete_ele_at_index(c_vector_h list,
-                                     const unsigned int index) {
+uint8_t c_vector_delete_ele_at_index(c_vector_h list, const uint8_t index) {
   c_check_input_pointer(list, "vector pointer", EXIT_FAILURE);
   struct c_vector *list_a = list;
   c_check_input_index(index, "vector length", list_a->metadata->_length,
                       EXIT_FAILURE);
 
   char *data = list_a->data;
-  unsigned int offset = get_offset(list, index);
+  uint8_t offset = get_offset(list, index);
   list_a->metadata->_free(&data[offset]);
   memset(&data[offset], 0, list_a->metadata->_ele_size);
   delete_shift(list, index);
