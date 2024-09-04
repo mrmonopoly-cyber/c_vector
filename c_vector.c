@@ -58,7 +58,7 @@ static int init_metadata(struct c_vector *list,
 }
 
 static int resize_list(struct c_vector **list) {
-  void *data = NULL;
+  char *data = NULL;
   unsigned int old_capacity = (*list)->metadata->_capacity;
   unsigned int new_capacity = old_capacity * 2;
   struct c_vector *new_list = realloc(
@@ -70,7 +70,7 @@ static int resize_list(struct c_vector **list) {
   new_list->metadata->_capacity = new_capacity;
   *list = new_list;
   data = (*list)->data;
-  memset(data + (old_capacity * new_list->metadata->_ele_size), 0,
+  memset(&data[old_capacity * new_list->metadata->_ele_size], 0,
          (new_capacity - old_capacity) * new_list->metadata->_ele_size);
 
   return EXIT_SUCCESS;
@@ -79,10 +79,10 @@ static int resize_list(struct c_vector **list) {
 static int delete_shift(struct c_vector *list, unsigned int start_index) {
   unsigned int offset_i = get_offset(list, start_index);
   unsigned int offset_j = 0;
-  void *data = list->data;
+  char *data = list->data;
   for (unsigned int j = start_index + 1; j < list->metadata->_length; j++) {
     offset_j = get_offset(list, j);
-    memcpy(data + offset_i, data + offset_j, list->metadata->_ele_size);
+    memcpy(&data[offset_i], &data[offset_j], list->metadata->_ele_size);
     start_index++;
     offset_i = get_offset(list, start_index);
   }
@@ -90,17 +90,17 @@ static int delete_shift(struct c_vector *list, unsigned int start_index) {
 }
 
 static void *get_element(struct c_vector *list, const void *key) {
-  void *data = list->data;
+  char *data = list->data;
   unsigned int offset = 0;
 
   for (unsigned int i = 0; i < list->metadata->_length; i++) {
     offset = get_offset(list, i);
     if (list->metadata->_cmp_fun) {
-      if (!list->metadata->_cmp_fun(data + offset, key)) {
-        return data + offset;
+      if (!list->metadata->_cmp_fun(&data[offset], key)) {
+        return &data[offset];
       }
-    } else if (!memcmp(data + offset, key, list->metadata->_ele_size)) {
-      return data + offset;
+    } else if (!memcmp(&data[offset], key, list->metadata->_ele_size)) {
+      return &data[offset];
     }
   }
   return NULL;
@@ -146,11 +146,11 @@ const void *c_vector_push(c_vector_h *list, const void *ele) {
   }
 
   unsigned int offset = get_offset(list_a, list_a->metadata->_length);
-  void *data = list_a->data;
-  memcpy(data + offset, ele, list_a->metadata->_ele_size);
+  char *data = list_a->data;
+  memcpy(&data[offset], ele, list_a->metadata->_ele_size);
   list_a->metadata->_length++;
 
-  return data + offset;
+  return &data[offset];
 }
 
 int c_vector_insert_in(c_vector_h *list, const void *ele,
@@ -163,8 +163,8 @@ int c_vector_insert_in(c_vector_h *list, const void *ele,
     resize_list(&list_a);
 
   unsigned int offset = (index * list_a->metadata->_ele_size);
-  void *data = list_a->data;
-  memcpy(data + offset, ele, list_a->metadata->_ele_size);
+  char *data = list_a->data;
+  memcpy(&data[offset], ele, list_a->metadata->_ele_size);
   return EXIT_SUCCESS;
 }
 
@@ -179,10 +179,10 @@ void *c_vector_get_at_index(c_vector_h list, const unsigned int index) {
   struct c_vector *list_a = list;
   c_check_input_index(index, "vector length", list_a->metadata->_length, NULL);
 
-  void *data = list_a->data;
+  char *data = list_a->data;
   unsigned int offset = get_offset(list_a, index);
 
-  return data + offset;
+  return &data[offset];
 }
 
 int c_vector_delete_ele(c_vector_h list, const void *ele) {
@@ -191,14 +191,14 @@ int c_vector_delete_ele(c_vector_h list, const void *ele) {
   c_check_input_pointer(ele, "vector element to delete", EXIT_FAILURE);
 
   unsigned int i = 0;
-  void *data = list_a->data;
+  char *data = list_a->data;
   unsigned int offset_i = 0;
 
   for (; i < list_a->metadata->_length; i++) {
     offset_i = get_offset(list_a, i);
     if (get_element(list_a, ele)) {
-      list_a->metadata->_free(data + offset_i);
-      memset(data + offset_i, 0, list_a->metadata->_ele_size);
+      list_a->metadata->_free(&data[offset_i]);
+      memset(&data[offset_i], 0, list_a->metadata->_ele_size);
       delete_shift(list, i);
       list_a->metadata->_length--;
       return EXIT_SUCCESS;
@@ -213,10 +213,10 @@ int c_vector_delete_ele_at_index(c_vector_h list, const unsigned int index) {
   c_check_input_index(index, "vector length", list_a->metadata->_length,
                       EXIT_FAILURE);
 
-  void *data = list_a->data;
+  char *data = list_a->data;
   unsigned int offset = get_offset(list, index);
-  list_a->metadata->_free(data + offset);
-  memset(data + offset, 0, list_a->metadata->_ele_size);
+  list_a->metadata->_free(&data[offset]);
+  memset(&data[offset], 0, list_a->metadata->_ele_size);
   delete_shift(list, index);
   list_a->metadata->_length--;
 
