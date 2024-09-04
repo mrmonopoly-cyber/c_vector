@@ -156,12 +156,12 @@ void *c_vector_find(c_vector_h list, const void *ele) {
   struct c_vector *list_a = list;
   void *data = list_a->data;
   unsigned int ele_size = list_a->metadata->_ele_size;
-  void *list_ele = 0;
+  unsigned offset = 0;
 
   for (unsigned int i = 0; i < list_a->metadata->_length; i++) {
-    list_ele = data + (i * ele_size);
-    if (!memcmp(list_ele, ele, list_a->metadata->_ele_size)) {
-      return list_ele;
+    offset = get_offset(list, i);
+    if (!memcmp(data + offset, ele, list_a->metadata->_ele_size)) {
+      return data + offset;
     }
   }
   return NULL;
