@@ -10,6 +10,7 @@ struct c_vector_metadata {
   unsigned int _ele_size;
   free_ele _free;
   print_ele _print;
+  comp_fun _cmp_fun;
 };
 
 struct c_vector {
@@ -51,6 +52,7 @@ static int init_metadata(struct c_vector *list,
   list->metadata->_ele_size = args->ele_size;
   list->metadata->_free = args->free_fun;
   list->metadata->_print = args->print_fun;
+  list->metadata->_cmp_fun = args->comp_fun;
 
   return EXIT_SUCCESS;
 }
@@ -85,6 +87,22 @@ static int delete_shift(struct c_vector *list, unsigned int start_index) {
     offset_i = get_offset(list, start_index);
   }
   return EXIT_SUCCESS;
+}
+
+static void *get_element(struct c_vector *list, const void *key) {
+  void *data = list->data;
+  unsigned int offset = 0;
+
+  for (unsigned int i = 0; i < list->metadata->_length; i++) {
+    offset = get_offset(list, i);
+    if (list->metadata->_cmp_fun &&
+        !list->metadata->_cmp_fun(data + offset, &i)) {
+      return data + offset;
+    } else if (!memcmp(data + offset, key, list->metadata->_ele_size)) {
+      return data + offset;
+    }
+  }
+  return NULL;
 }
 
 // public
@@ -152,19 +170,7 @@ int c_vector_insert_in(c_vector_h *list, const void *ele,
 void *c_vector_find(c_vector_h list, const void *ele) {
   c_check_input_pointer(list, "vector pointer", NULL);
   c_check_input_pointer(ele, "vector element to find", NULL);
-
-  struct c_vector *list_a = list;
-  void *data = list_a->data;
-  unsigned int ele_size = list_a->metadata->_ele_size;
-  unsigned offset = 0;
-
-  for (unsigned int i = 0; i < list_a->metadata->_length; i++) {
-    offset = get_offset(list, i);
-    if (!memcmp(data + offset, ele, list_a->metadata->_ele_size)) {
-      return data + offset;
-    }
-  }
-  return NULL;
+  return get_element(list, ele);
 }
 
 void *c_vector_get_at_index(c_vector_h list, const unsigned int index) {
@@ -189,7 +195,7 @@ int c_vector_delete_ele(c_vector_h list, const void *ele) {
 
   for (; i < list_a->metadata->_length; i++) {
     offset_i = get_offset(list_a, i);
-    if (!memcmp(data + offset_i, ele, list_a->metadata->_ele_size)) {
+    if (get_element(list_a, ele)) {
       list_a->metadata->_free(data + offset_i);
       memset(data + offset_i, 0, list_a->metadata->_ele_size);
       delete_shift(list, i);

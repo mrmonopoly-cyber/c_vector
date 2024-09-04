@@ -1,6 +1,7 @@
 #pragma once
 
 typedef void *c_vector_h;
+typedef int (*comp_fun)(const void *ele_list, const void *key);
 typedef void (*free_ele)(void *ele);
 typedef void (*print_ele)(const void *ele);
 
@@ -17,6 +18,7 @@ enum ERRORS {
 struct c_vector_input_init {
   int capacity;
   unsigned int ele_size;
+  comp_fun comp_fun;
   print_ele print_fun;
   free_ele free_fun;
 };

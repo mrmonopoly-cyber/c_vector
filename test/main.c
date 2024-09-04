@@ -21,6 +21,7 @@ void test_init() {
   input_args.ele_size = sizeof(int);
   input_args.free_fun = free_int;
   input_args.print_fun = print_int;
+  input_args.comp_fun = compare_ints;
 
   c_vector_h vec = c_vector_init(&input_args);
   if (vec == NULL) {
@@ -39,6 +40,7 @@ void test_insert_and_get() {
   input_args.ele_size = sizeof(int);
   input_args.free_fun = free_int;
   input_args.print_fun = print_int;
+  input_args.comp_fun = compare_ints;
 
   c_vector_h vec = c_vector_init(&input_args);
 
@@ -62,6 +64,7 @@ void test_delete() {
   input_args.ele_size = sizeof(int);
   input_args.free_fun = free_int;
   input_args.print_fun = print_int;
+  input_args.comp_fun = compare_ints;
 
   c_vector_h vec = c_vector_init(&input_args);
 
@@ -94,6 +97,7 @@ void test_resize() {
   input_args.ele_size = sizeof(int);
   input_args.free_fun = free_int;
   input_args.print_fun = print_int;
+  input_args.comp_fun = compare_ints;
 
   c_vector_h vec = c_vector_init(&input_args);
 
@@ -120,6 +124,7 @@ void test_find() {
   input_args.ele_size = sizeof(int);
   input_args.free_fun = free_int;
   input_args.print_fun = print_int;
+  input_args.comp_fun = compare_ints;
 
   c_vector_h vec = c_vector_init(&input_args);
 
@@ -144,6 +149,7 @@ void test_clear() {
   input_args.ele_size = sizeof(int);
   input_args.free_fun = free_int;
   input_args.print_fun = print_int;
+  input_args.comp_fun = compare_ints;
 
   c_vector_h vec = c_vector_init(&input_args);
 
