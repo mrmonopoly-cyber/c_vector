@@ -8,7 +8,6 @@ struct c_vector_metadata {
   unsigned int _capacity;
   unsigned int _length;
   unsigned int _ele_size;
-  comp_fun _cmp;
   free_ele _free;
   print_ele _print;
 };
@@ -36,12 +35,12 @@ struct c_vector {
   }
 
 // private
-inline static unsigned int get_offset(const c_vector *list,
+inline static unsigned int get_offset(const struct c_vector *list,
                                       const unsigned int position) {
   return list->metadata->_ele_size * position;
 }
 
-static int init_metadata(c_vector *list,
+static int init_metadata(struct c_vector *list,
                          const struct c_vector_input_init *args) {
   list->metadata = calloc(1, sizeof(*list->metadata));
   if (!list->metadata) {
@@ -50,18 +49,17 @@ static int init_metadata(c_vector *list,
   }
   list->metadata->_capacity = args->capacity;
   list->metadata->_ele_size = args->ele_size;
-  list->metadata->_cmp = args->found_f;
   list->metadata->_free = args->free_fun;
   list->metadata->_print = args->print_fun;
 
   return EXIT_SUCCESS;
 }
 
-static int resize_list(c_vector **list) {
+static int resize_list(struct c_vector **list) {
   void *data = NULL;
   unsigned int old_capacity = (*list)->metadata->_capacity;
   unsigned int new_capacity = old_capacity * 2;
-  c_vector *new_list = realloc(
+  struct c_vector *new_list = realloc(
       (*list), sizeof(**list) + (new_capacity * (*list)->metadata->_ele_size));
   if (!new_list) {
     fprintf(stderr, "PANIC, not enough memory to alloc the list\n");
@@ -76,10 +74,22 @@ static int resize_list(c_vector **list) {
   return EXIT_SUCCESS;
 }
 
+static int delete_shift(struct c_vector *list, unsigned int start_index) {
+  unsigned int offset_i = get_offset(list, start_index);
+  unsigned int offset_j = 0;
+  void *data = list->data;
+  for (unsigned int j = start_index + 1; j < list->metadata->_length; j++) {
+    offset_j = get_offset(list, j);
+    memcpy(data + offset_i, data + offset_j, list->metadata->_ele_size);
+    start_index++;
+    offset_i = get_offset(list, start_index);
+  }
+  return EXIT_SUCCESS;
+}
+
 // public
-c_vector *c_vector_init(const struct c_vector_input_init *input_args) {
+c_vector_h c_vector_init(const struct c_vector_input_init *input_args) {
   c_check_input_pointer(input_args, "input args init", NULL);
-  c_check_input_pointer(input_args->found_f, "found_f", NULL);
   c_check_input_pointer(input_args->free_fun, "free_fun", NULL);
   c_check_input_pointer(input_args->print_fun, "print_fun", NULL);
 
@@ -92,7 +102,7 @@ c_vector *c_vector_init(const struct c_vector_input_init *input_args) {
   }
 
   unsigned int vec_cap = capacity < 0 ? DEFAULT_CAPACITY : capacity;
-  c_vector *new_vector =
+  struct c_vector *new_vector =
       calloc(1, sizeof(*new_vector) + (vec_cap * ele_size) + 100);
 
   if (!new_vector) {
@@ -105,131 +115,147 @@ c_vector *c_vector_init(const struct c_vector_input_init *input_args) {
   return new_vector;
 }
 
-const void *c_vector_push(c_vector **list, const void *ele) {
+const void *c_vector_push(c_vector_h *list, const void *ele) {
   c_check_input_pointer(list, "vector root pointer", NULL);
+  struct c_vector *list_a = *list;
   c_check_input_pointer(*list, "vector pointer", NULL);
   c_check_input_pointer(list, "vector element to push", NULL);
 
-  if ((*list)->metadata->_length == (*list)->metadata->_capacity) {
-    resize_list(list);
+  if (list_a->metadata->_length == list_a->metadata->_capacity) {
+    resize_list(&list_a);
+    *list = list_a;
   }
 
-  unsigned int offset = get_offset(*list, (*list)->metadata->_length);
-  void *data = (*list)->data;
-  memcpy(data + offset, ele, (*list)->metadata->_ele_size);
-  (*list)->metadata->_length++;
+  unsigned int offset = get_offset(list_a, list_a->metadata->_length);
+  void *data = list_a->data;
+  memcpy(data + offset, ele, list_a->metadata->_ele_size);
+  list_a->metadata->_length++;
 
   return data + offset;
 }
 
-int c_vector_insert_in(c_vector **list, const void *ele,
+int c_vector_insert_in(c_vector_h *list, const void *ele,
                        const unsigned int index) {
   c_check_input_pointer(list, "vector pointer", EXIT_FAILURE);
-  c_check_input_pointer(list, "vector element to insert", EXIT_FAILURE);
+  struct c_vector *list_a = *list;
+  c_check_input_pointer(ele, "vector element to insert", EXIT_FAILURE);
 
-  if (index > (*list)->metadata->_capacity)
-    resize_list(list);
+  if (index > list_a->metadata->_capacity)
+    resize_list(&list_a);
 
-  unsigned int offset = (index * (*list)->metadata->_ele_size);
-  void *data = (*list)->data;
-  memcpy(data + offset, ele, (*list)->metadata->_ele_size);
+  unsigned int offset = (index * list_a->metadata->_ele_size);
+  void *data = list_a->data;
+  memcpy(data + offset, ele, list_a->metadata->_ele_size);
   return EXIT_SUCCESS;
 }
 
-void *c_vector_find(c_vector *list, const void *ele) {
+void *c_vector_find(c_vector_h list, const void *ele) {
   c_check_input_pointer(list, "vector pointer", NULL);
-  c_check_input_pointer(list, "vector element to find", NULL);
+  c_check_input_pointer(ele, "vector element to find", NULL);
 
-  void *data = list->data;
-  unsigned int ele_size = list->metadata->_ele_size;
+  struct c_vector *list_a = list;
+  void *data = list_a->data;
+  unsigned int ele_size = list_a->metadata->_ele_size;
   void *list_ele = 0;
 
-  for (unsigned int i = 0; i < list->metadata->_length; i++) {
+  for (unsigned int i = 0; i < list_a->metadata->_length; i++) {
     list_ele = data + (i * ele_size);
-    if (list->metadata->_cmp(list_ele, ele)) {
+    if (!memcmp(list_ele, ele, list_a->metadata->_ele_size)) {
       return list_ele;
     }
   }
   return NULL;
 }
 
-void *c_vector_get_at_index(c_vector *list, const unsigned int index) {
+void *c_vector_get_at_index(c_vector_h list, const unsigned int index) {
   c_check_input_pointer(list, "vector pointer", NULL);
-  c_check_input_index(index, "vector length", list->metadata->_length, NULL);
+  struct c_vector *list_a = list;
+  c_check_input_index(index, "vector length", list_a->metadata->_length, NULL);
 
-  void *data = list->data;
-  unsigned int offset = get_offset(list, index);
+  void *data = list_a->data;
+  unsigned int offset = get_offset(list_a, index);
 
   return data + offset;
 }
 
-int c_vector_delete_ele(c_vector *list, const void *ele) {
-  c_check_input_pointer(list, "vector pointer", EXIT_FAILURE);
+int c_vector_delete_ele(c_vector_h list, const void *ele) {
+  struct c_vector *list_a = list;
+  c_check_input_pointer(list_a, "vector pointer", EXIT_FAILURE);
   c_check_input_pointer(ele, "vector element to delete", EXIT_FAILURE);
 
   unsigned int i = 0;
-  void *data = list->data;
-  unsigned int offset = 0;
+  void *data = list_a->data;
+  unsigned int offset_i = 0;
 
-  for (; i < list->metadata->_length; i++) {
-    offset = get_offset(list, i);
-    if (list->metadata->_cmp(data + offset, ele)) {
-      list->metadata->_free(data + offset);
-      memset(data + offset, 0, list->metadata->_ele_size);
-      list->metadata->_length--;
+  for (; i < list_a->metadata->_length; i++) {
+    offset_i = get_offset(list_a, i);
+    if (!memcmp(data + offset_i, ele, list_a->metadata->_ele_size)) {
+      list_a->metadata->_free(data + offset_i);
+      memset(data + offset_i, 0, list_a->metadata->_ele_size);
+      delete_shift(list, i);
+      list_a->metadata->_length--;
       return EXIT_SUCCESS;
     }
   }
-  return EXIT_SUCCESS;
+  return EXIT_FAILURE;
 }
 
-int c_vector_delete_ele_at_index(c_vector *list, const unsigned int index) {
+int c_vector_delete_ele_at_index(c_vector_h list, const unsigned int index) {
   c_check_input_pointer(list, "vector pointer", EXIT_FAILURE);
-  c_check_input_index(index, "vector length", list->metadata->_length,
+  struct c_vector *list_a = list;
+  c_check_input_index(index, "vector length", list_a->metadata->_length,
                       EXIT_FAILURE);
 
-  void *data = list->data;
+  void *data = list_a->data;
   unsigned int offset = get_offset(list, index);
-  list->metadata->_free(data + offset);
-  memset(data + offset, 0, list->metadata->_ele_size);
+  list_a->metadata->_free(data + offset);
+  memset(data + offset, 0, list_a->metadata->_ele_size);
+  delete_shift(list, index);
+  list_a->metadata->_length--;
 
   return EXIT_SUCCESS;
 }
 
-int c_vector_free(c_vector *list) {
-  c_check_input_pointer(list, "vector pointer", EXIT_FAILURE);
-  c_vector_foreach(list, list->metadata->_free);
-  free(list->metadata);
+int c_vector_free(c_vector_h list) {
+  struct c_vector *list_a = list;
+  c_check_input_pointer(list_a, "vector pointer", EXIT_FAILURE);
+  c_vector_foreach(list_a, list_a->metadata->_free);
+  free(list_a->metadata);
   free(list);
   return EXIT_SUCCESS;
 }
 
-void c_vector_to_string(c_vector *list) {
+void c_vector_to_string(c_vector_h list) {
+  struct c_vector *list_a = list;
   c_check_input_pointer(list, "vector pointer", );
-  c_vector_foreach(list, list->metadata->_print);
+  c_vector_foreach(list_a, list_a->metadata->_print);
 }
 
-unsigned int c_vector_length(const c_vector *list) {
-  c_check_input_pointer(list, "vector pointer", EXIT_FAILURE);
+unsigned int c_vector_length(const c_vector_h list) {
+  struct c_vector *list_a = list;
+  c_check_input_pointer(list_a, "vector pointer", EXIT_FAILURE);
 
-  return list->metadata->_length;
+  return list_a->metadata->_length;
 }
 
-unsigned int c_vector_capacity(const c_vector *list) {
-  c_check_input_pointer(list, "vector pointer", EXIT_FAILURE);
+unsigned int c_vector_capacity(const c_vector_h list) {
+  struct c_vector *list_a = list;
+  c_check_input_pointer(list_a, "vector pointer", EXIT_FAILURE);
 
-  return list->metadata->_capacity;
+  return list_a->metadata->_capacity;
 }
 
-unsigned int c_vector_ele_size(const c_vector *list) {
-  c_check_input_pointer(list, "vector pointer", EXIT_FAILURE);
+unsigned int c_vector_ele_size(const c_vector_h list) {
+  struct c_vector *list_a = list;
+  c_check_input_pointer(list_a, "vector pointer", EXIT_FAILURE);
 
-  return list->metadata->_ele_size;
+  return list_a->metadata->_ele_size;
 }
 
-unsigned int c_vector_clear(const c_vector *list) {
-  c_check_input_pointer(list, "vector pointer", EXIT_FAILURE);
-  list->metadata->_length = 0;
+unsigned int c_vector_clear(const c_vector_h list) {
+  struct c_vector *list_a = list;
+  c_check_input_pointer(list_a, "vector pointer", EXIT_FAILURE);
+  list_a->metadata->_length = 0;
 
   return EXIT_SUCCESS;
 }
