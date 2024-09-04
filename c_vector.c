@@ -153,8 +153,8 @@ const void *c_vector_push(c_vector_h *list, const void *ele) {
   return &data[offset];
 }
 
-int c_vector_insert_in(c_vector_h *list, const void *ele,
-                       const unsigned int index) {
+uint8_t c_vector_insert_in(c_vector_h *list, const void *ele,
+                           const unsigned int index) {
   c_check_input_pointer(list, "vector pointer", EXIT_FAILURE);
   struct c_vector *list_a = *list;
   c_check_input_pointer(ele, "vector element to insert", EXIT_FAILURE);
@@ -185,7 +185,7 @@ void *c_vector_get_at_index(c_vector_h list, const unsigned int index) {
   return &data[offset];
 }
 
-int c_vector_delete_ele(c_vector_h list, const void *ele) {
+uint8_t c_vector_delete_ele(c_vector_h list, const void *ele) {
   struct c_vector *list_a = list;
   c_check_input_pointer(list_a, "vector pointer", EXIT_FAILURE);
   c_check_input_pointer(ele, "vector element to delete", EXIT_FAILURE);
@@ -207,7 +207,8 @@ int c_vector_delete_ele(c_vector_h list, const void *ele) {
   return EXIT_FAILURE;
 }
 
-int c_vector_delete_ele_at_index(c_vector_h list, const unsigned int index) {
+uint8_t c_vector_delete_ele_at_index(c_vector_h list,
+                                     const unsigned int index) {
   c_check_input_pointer(list, "vector pointer", EXIT_FAILURE);
   struct c_vector *list_a = list;
   c_check_input_index(index, "vector length", list_a->metadata->_length,
@@ -223,7 +224,7 @@ int c_vector_delete_ele_at_index(c_vector_h list, const unsigned int index) {
   return EXIT_SUCCESS;
 }
 
-int c_vector_free(c_vector_h list) {
+uint8_t c_vector_free(c_vector_h list) {
   struct c_vector *list_a = list;
   c_check_input_pointer(list_a, "vector pointer", EXIT_FAILURE);
   c_vector_foreach(list_a, list_a->metadata->_free);
@@ -238,28 +239,28 @@ void c_vector_to_string(c_vector_h list) {
   c_vector_foreach(list_a, list_a->metadata->_print);
 }
 
-unsigned int c_vector_length(const c_vector_h list) {
+uint8_t c_vector_length(const c_vector_h list) {
   struct c_vector *list_a = list;
   c_check_input_pointer(list_a, "vector pointer", EXIT_FAILURE);
 
   return list_a->metadata->_length;
 }
 
-unsigned int c_vector_capacity(const c_vector_h list) {
+uint8_t c_vector_capacity(const c_vector_h list) {
   struct c_vector *list_a = list;
   c_check_input_pointer(list_a, "vector pointer", EXIT_FAILURE);
 
   return list_a->metadata->_capacity;
 }
 
-unsigned int c_vector_ele_size(const c_vector_h list) {
+uint8_t c_vector_ele_size(const c_vector_h list) {
   struct c_vector *list_a = list;
   c_check_input_pointer(list_a, "vector pointer", EXIT_FAILURE);
 
   return list_a->metadata->_ele_size;
 }
 
-unsigned int c_vector_clear(const c_vector_h list) {
+uint8_t c_vector_clear(const c_vector_h list) {
   struct c_vector *list_a = list;
   c_check_input_pointer(list_a, "vector pointer", EXIT_FAILURE);
   list_a->metadata->_length = 0;
