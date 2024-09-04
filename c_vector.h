@@ -7,7 +7,7 @@ typedef void (*print_ele)(const void *ele);
 
 #define DEFAULT_CAPACITY 10
 
-enum ERRORS {
+enum C_VECTOR_ERRORS {
   NULL_REFERENCE_LIST = -1,
   NULL_REFERENCE_ELEMENT = -2,
   INVALID_INDEX_VALUE = -3,
