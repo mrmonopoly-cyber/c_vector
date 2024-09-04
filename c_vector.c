@@ -95,9 +95,10 @@ static void *get_element(struct c_vector *list, const void *key) {
 
   for (unsigned int i = 0; i < list->metadata->_length; i++) {
     offset = get_offset(list, i);
-    if (list->metadata->_cmp_fun &&
-        !list->metadata->_cmp_fun(data + offset, &i)) {
-      return data + offset;
+    if (list->metadata->_cmp_fun) {
+      if (!list->metadata->_cmp_fun(data + offset, key)) {
+        return data + offset;
+      }
     } else if (!memcmp(data + offset, key, list->metadata->_ele_size)) {
       return data + offset;
     }
