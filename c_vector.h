@@ -19,8 +19,8 @@ enum C_VECTOR_ERRORS {
 };
 
 struct c_vector_input_init {
-  int capacity;
-  unsigned int ele_size;
+  uint8_t capacity;
+  uint8_t ele_size;
   comp_fun comp_fun;
   print_ele print_fun;
   free_ele free_fun;
