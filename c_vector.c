@@ -30,9 +30,9 @@ struct c_vector {
 
 #define c_vector_foreach(LIST, FUN)                                            \
   for (unsigned int i = 0; i < LIST->metadata->_length; i++) {                 \
-    void *data = LIST->data;                                                   \
+    char *data = LIST->data;                                                   \
     unsigned int offset = get_offset(LIST, i);                                 \
-    FUN(data + offset);                                                        \
+    FUN(&data[offset]);                                                        \
   }
 
 // private

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __C_VECTOR__
+#define __C_VECTOR__
 
 typedef void *c_vector_h;
 typedef int (*comp_fun)(const void *ele_list, const void *key);
@@ -47,3 +48,5 @@ unsigned int c_vector_capacity(const c_vector_h list);
 unsigned int c_vector_ele_size(const c_vector_h list);
 
 unsigned int c_vector_clear(const c_vector_h list);
+
+#endif //!__C_VECTOR__
