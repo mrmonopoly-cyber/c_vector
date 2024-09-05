@@ -31,13 +31,13 @@ struct c_vector {
 #define c_vector_foreach(LIST, FUN)                                            \
   for (uint8_t i = 0; i < LIST->metadata->_length; i++) {                      \
     char *data = LIST->data;                                                   \
-    uint8_t offset = get_offset(LIST, i);                                      \
+    uint32_t offset = get_offset(LIST, i);                                     \
     FUN(&data[offset]);                                                        \
   }
 
 // private
-inline static uint8_t get_offset(const struct c_vector *list,
-                                 const uint8_t position) {
+inline static uint32_t get_offset(const struct c_vector *list,
+                                  const uint8_t position) {
   return list->metadata->_ele_size * position;
 }
 
@@ -77,8 +77,8 @@ static int resize_list(struct c_vector **list) {
 }
 
 static int delete_shift(struct c_vector *list, uint8_t start_index) {
-  uint8_t offset_i = get_offset(list, start_index);
-  uint8_t offset_j = 0;
+  uint32_t offset_i = get_offset(list, start_index);
+  uint32_t offset_j = 0;
   char *data = list->data;
   for (uint8_t j = start_index + 1; j < list->metadata->_length; j++) {
     offset_j = get_offset(list, j);
@@ -91,7 +91,7 @@ static int delete_shift(struct c_vector *list, uint8_t start_index) {
 
 static void *get_element(struct c_vector *list, const void *key) {
   char *data = list->data;
-  uint8_t offset = 0;
+  uint32_t offset = 0;
 
   for (uint8_t i = 0; i < list->metadata->_length; i++) {
     offset = get_offset(list, i);
@@ -145,7 +145,7 @@ const void *c_vector_push(c_vector_h *list, const void *ele) {
     *list = list_a;
   }
 
-  uint8_t offset = get_offset(list_a, list_a->metadata->_length);
+  uint32_t offset = get_offset(list_a, list_a->metadata->_length);
   char *data = list_a->data;
   memcpy(&data[offset], ele, list_a->metadata->_ele_size);
   list_a->metadata->_length++;
@@ -180,7 +180,7 @@ void *c_vector_get_at_index(c_vector_h list, const uint8_t index) {
   c_check_input_index(index, "vector length", list_a->metadata->_length, NULL);
 
   char *data = list_a->data;
-  uint8_t offset = get_offset(list_a, index);
+  uint32_t offset = get_offset(list_a, index);
 
   return &data[offset];
 }
@@ -192,7 +192,7 @@ uint8_t c_vector_delete_ele(c_vector_h list, const void *ele) {
 
   uint8_t i = 0;
   char *data = list_a->data;
-  uint8_t offset_i = 0;
+  uint32_t offset_i = 0;
 
   for (; i < list_a->metadata->_length; i++) {
     offset_i = get_offset(list_a, i);
@@ -214,7 +214,7 @@ uint8_t c_vector_delete_ele_at_index(c_vector_h list, const uint8_t index) {
                       EXIT_FAILURE);
 
   char *data = list_a->data;
-  uint8_t offset = get_offset(list, index);
+  uint32_t offset = get_offset(list, index);
   list_a->metadata->_free(&data[offset]);
   memset(&data[offset], 0, list_a->metadata->_ele_size);
   delete_shift(list, index);
