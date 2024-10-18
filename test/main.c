@@ -23,7 +23,7 @@ void test_init() {
   input_args.print_fun = print_int;
   input_args.comp_fun = compare_ints;
 
-  c_vector_h vec = c_vector_init(&input_args);
+  c_vector_h *vec = c_vector_init(&input_args);
   if (vec == NULL) {
     printf("Initialization failed!\n");
     return;
@@ -42,7 +42,7 @@ void test_insert_and_get() {
   input_args.print_fun = print_int;
   input_args.comp_fun = compare_ints;
 
-  c_vector_h vec = c_vector_init(&input_args);
+  c_vector_h *vec = c_vector_init(&input_args);
 
   int value = 10;
   c_vector_push(&vec, &value);
@@ -66,7 +66,7 @@ void test_delete() {
   input_args.print_fun = print_int;
   input_args.comp_fun = compare_ints;
 
-  c_vector_h vec = c_vector_init(&input_args);
+  c_vector_h *vec = c_vector_init(&input_args);
 
   int value1 = 10, value2 = 20, value3 = 30;
   c_vector_push(&vec, &value1);
@@ -99,7 +99,7 @@ void test_resize() {
   input_args.print_fun = print_int;
   input_args.comp_fun = compare_ints;
 
-  c_vector_h vec = c_vector_init(&input_args);
+  c_vector_h *vec = c_vector_init(&input_args);
 
   int value1 = 10, value2 = 20, value3 = 30;
   c_vector_push(&vec, &value1);
@@ -126,7 +126,7 @@ void test_find() {
   input_args.print_fun = print_int;
   input_args.comp_fun = compare_ints;
 
-  c_vector_h vec = c_vector_init(&input_args);
+  c_vector_h *vec = c_vector_init(&input_args);
 
   int value1 = 10, value2 = 20;
   c_vector_push(&vec, &value1);
@@ -151,7 +151,7 @@ void test_clear() {
   input_args.print_fun = print_int;
   input_args.comp_fun = compare_ints;
 
-  c_vector_h vec = c_vector_init(&input_args);
+  c_vector_h *vec = c_vector_init(&input_args);
 
   int value1 = 10, value2 = 20;
   c_vector_push(&vec, &value1);
