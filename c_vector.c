@@ -11,6 +11,7 @@ struct c_vector_metadata {
   free_ele _free;
   print_ele _print;
   comp_fun _cmp_fun;
+  object_populate _pop_fun;
 };
 
 struct c_vector {
@@ -53,6 +54,7 @@ static int init_metadata(struct c_vector *list,
   list->metadata->_free = args->free_fun;
   list->metadata->_print = args->print_fun;
   list->metadata->_cmp_fun = args->comp_fun;
+  list->metadata->_pop_fun = args->populate_fun;
 
   return EXIT_SUCCESS;
 }
@@ -106,6 +108,21 @@ static void *get_element(struct c_vector *list, const void *key) {
   return NULL;
 }
 
+static void *c_vector_give_new_position(c_vector_h *list){
+  c_check_input_pointer(list, "vector root pointer", NULL);
+  c_check_input_pointer(*list, "vector pointer", NULL);
+  struct c_vector *list_a = *list;
+
+  if (list_a->metadata->_length == list_a->metadata->_capacity) {
+    resize_list(&list_a);
+    *list = list_a;
+  }
+  uint32_t offset = get_offset(list_a, list_a->metadata->_length);
+  char *data = list_a->data;
+
+  return &data[offset];
+}
+
 // public
 c_vector_h c_vector_init(const struct c_vector_input_init *input_args) {
   c_check_input_pointer(input_args, "input args init", NULL);
@@ -135,22 +152,24 @@ c_vector_h c_vector_init(const struct c_vector_input_init *input_args) {
 }
 
 const void *c_vector_push(c_vector_h *list, const void *ele) {
-  c_check_input_pointer(list, "vector root pointer", NULL);
+  c_check_input_pointer(ele, "element to push", NULL);
+  char *data = c_vector_give_new_position(list);
+
   struct c_vector *list_a = *list;
-  c_check_input_pointer(*list, "vector pointer", NULL);
-  c_check_input_pointer(list, "vector element to push", NULL);
-
-  if (list_a->metadata->_length == list_a->metadata->_capacity) {
-    resize_list(&list_a);
-    *list = list_a;
-  }
-
-  uint32_t offset = get_offset(list_a, list_a->metadata->_length);
-  char *data = list_a->data;
-  memcpy(&data[offset], ele, list_a->metadata->_ele_size);
+  memcpy(data, ele, list_a->metadata->_ele_size);
   list_a->metadata->_length++;
 
-  return &data[offset];
+  return data;
+}
+
+const void *c_vector_emplace_back(c_vector_h *list, const void *args){
+  c_check_input_pointer(args, "config of new element", NULL);
+  char *data = c_vector_give_new_position(list);
+  struct c_vector *list_a = *list;
+
+  list_a->metadata->_pop_fun(data,args);
+
+  return data;
 }
 
 uint8_t c_vector_insert_in(c_vector_h *list, const void *ele,

@@ -7,6 +7,7 @@ typedef void *c_vector_h;
 typedef int (*comp_fun)(const void *ele_list, const void *key);
 typedef void (*free_ele)(void *ele);
 typedef void (*print_ele)(const void *ele);
+typedef void (*object_populate)(void* obj_ele,const void *args);
 
 #define DEFAULT_CAPACITY 10
 
@@ -24,6 +25,7 @@ struct c_vector_input_init {
   comp_fun comp_fun;
   print_ele print_fun;
   free_ele free_fun;
+  object_populate populate_fun;
 };
 
 c_vector_h c_vector_init(const struct c_vector_input_init *input_args);
@@ -34,6 +36,8 @@ uint8_t c_vector_insert_in(c_vector_h *list, const void *ele,
                            const uint8_t index);
 
 const void *c_vector_push(c_vector_h *list, const void *ele);
+
+const void *c_vector_emplace_back(c_vector_h *list, const void *args);
 
 void *c_vector_find(c_vector_h list, const void *ele);
 
