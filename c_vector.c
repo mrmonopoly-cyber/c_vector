@@ -164,9 +164,10 @@ const void *c_vector_push(c_vector_h **list, const void *ele) {
 
 const void *c_vector_emplace_back(c_vector_h **list, const void *args){
   c_check_input_pointer(args, "config of new element", NULL);
-  char *data = c_vector_give_new_position(list);
   struct c_vector *list_a = *list;
+  c_check_input_pointer(list_a->metadata->_pop_fun, "populataion function", NULL);
 
+  char *data = c_vector_give_new_position(list);
   list_a->metadata->_pop_fun(data,args);
 
   return data;
