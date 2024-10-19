@@ -53,10 +53,10 @@ enum C_VECTOR_ERRORS {
 struct c_vector_input_init {
     uint8_t capacity;           /* Initial capacity of the vector */
     uint8_t ele_size;           /* Size of each element in the vector */
-    comp_fun comp_fun;          /* Pointer to the comparison function */
-    print_ele print_fun;        /* Pointer to the function to print elements */
-    free_ele free_fun;          /* Pointer to the function to free elements */
-    object_populate populate_fun; /* Pointer to the function to populate an element */
+    comp_fun comp_fun;          /* Pointer to the comparison function, if NULL a bit by bit comparison will be used */
+    print_ele print_fun;        /* Pointer to the function to print elements, if NULL c_vector_print will do nothing */
+    free_ele free_fun;          /* Pointer to the function to free elements, only pass this function if you have nested pointer to free */
+    object_populate populate_fun; /* Pointer to the function to populate an element, if NULL c_vector_emplace_back will do nothing */
 };
 
 /**

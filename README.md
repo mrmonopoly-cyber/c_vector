@@ -1,6 +1,6 @@
 # C Vector Library
 
-![License](https://img.shields.io/github/license/mrmonopoly-cyber/c_vector) ![Language](https://img.shields.io/badge/language-C-blue) ![Version](https://img.shields.io/badge/version-1.0.0-green)
+![License](https://img.shields.io/github/license/mrmonopoly-cyber/c_vector) ![Language](https://img.shields.io/badge/language-C-blue) ![Version](https://img.shields.io/badge/version-2.4.2-green)
 
 `c_vector` is a dynamic array (vector) implementation in C that supports various operations such as insertion, deletion, search, and memory management for generic data types. The library allows customization of key behaviors like comparison, element construction, and destruction, making it a versatile tool for managing dynamic collections of elements in C.
 
@@ -32,13 +32,21 @@
    ```bash
    git clone https://github.com/mrmonopoly-cyber/c_vector.git
    ```
-2. Navigate to the directory:
+2. Build using the provided Makefile:
+You can compile the library using the provided Makefile.\
+The Makefile includes two primary build options: release and debug.\
+    - Release Build (Optimized for performance):\
    ```bash
-   cd c_vector
+   make release 
    ```
-3. Include the `c_vector.h` header in your project and link the implementation file `c_vector.c` when compiling:
+
    ```bash
-   gcc -o your_program your_program.c c_vector.c
+   make 
+   ```
+
+    - Debug Build (Optimized for performance):\
+   ```bash
+   make debug 
    ```
 
 ## Usage
