@@ -218,7 +218,6 @@ uint8_t c_vector_delete_ele(c_vector_h *list, const void *ele) {
     offset_i = get_offset(list_a, i);
     if (get_element(list_a, ele)) {
       list_a->metadata->_free(&data[offset_i]);
-      memset(&data[offset_i], 0, list_a->metadata->_ele_size);
       delete_shift(list, i);
       list_a->metadata->_length--;
       return EXIT_SUCCESS;
@@ -236,7 +235,6 @@ uint8_t c_vector_delete_ele_at_index(c_vector_h *list, const uint8_t index) {
   char *data = list_a->data;
   uint32_t offset = get_offset(list, index);
   list_a->metadata->_free(&data[offset]);
-  memset(&data[offset], 0, list_a->metadata->_ele_size);
   delete_shift(list, index);
   list_a->metadata->_length--;
 
