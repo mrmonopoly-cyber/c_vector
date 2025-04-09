@@ -246,7 +246,7 @@ uint8_t c_vector_free(c_vector_h *list) {
   c_check_input_pointer(list_a, "vector pointer", EXIT_FAILURE);
   c_vector_foreach(list_a, list_a->metadata->_free);
   free(list_a->metadata);
-  free(list);
+  free(list_a);
   return EXIT_SUCCESS;
 }
 
