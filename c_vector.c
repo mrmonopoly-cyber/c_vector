@@ -1,13 +1,15 @@
 #include "c_vector.h"
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+
 struct c_vector_metadata {
   uint8_t _capacity;
   uint8_t _length;
-  uint8_t _ele_size;
+  EleSizeUnit_t _ele_size;
   free_ele _free;
   print_ele _print;
   comp_fun _cmp_fun;
@@ -36,6 +38,13 @@ struct c_vector {
     FUN(&data[offset]);                                                        \
   }
 
+#define c_vector_foreach_new(LIST, DATA_PTR)                                   \
+  for (uint8_t i = 0; i < LIST->metadata->_length;\
+      (i++,DATA_PTR = &LIST->data[get_offset(LIST,i)]))
+
+#ifdef DEBUG
+#endif /* ifdef DEBUG */
+
 // private
 inline static uint32_t get_offset(const struct c_vector *list,
                                   const uint8_t position) {
@@ -62,7 +71,7 @@ static int init_metadata(struct c_vector *list,
 static int resize_list(struct c_vector **list) {
   char *data = NULL;
   uint8_t old_capacity = (*list)->metadata->_capacity;
-  uint8_t new_capacity = old_capacity * 2;
+  uint8_t new_capacity = !old_capacity? 1 : old_capacity * 2;
   struct c_vector *new_list = realloc(
       (*list), sizeof(**list) + (new_capacity * (*list)->metadata->_ele_size));
   if (!new_list) {
@@ -126,10 +135,9 @@ static void *c_vector_give_new_position(c_vector_h * *list){
 // public
 c_vector_h *c_vector_init(const struct c_vector_input_init *input_args) {
   c_check_input_pointer(input_args, "input args init", NULL);
-  c_check_input_pointer(input_args->free_fun, "free_fun", NULL);
   c_check_input_pointer(input_args->print_fun, "print_fun", NULL);
 
-  uint8_t ele_size = input_args->ele_size;
+  uint16_t ele_size = input_args->ele_size;
   int capacity = input_args->capacity;
   if (!ele_size) {
     fprintf(stderr, "FAILED: invalid element size, at least > 0, given %d\n",
@@ -182,7 +190,7 @@ uint8_t c_vector_insert_in(c_vector_h **list, const void *ele,
   if (index > list_a->metadata->_capacity)
     resize_list(&list_a);
 
-  uint8_t offset = (index * list_a->metadata->_ele_size);
+  EleSizeUnit_t offset = (index * list_a->metadata->_ele_size);
   char *data = list_a->data;
   memcpy(&data[offset], ele, list_a->metadata->_ele_size);
   return EXIT_SUCCESS;
@@ -217,7 +225,10 @@ uint8_t c_vector_delete_ele(c_vector_h *list, const void *ele) {
   for (; i < list_a->metadata->_length; i++) {
     offset_i = get_offset(list_a, i);
     if (get_element(list_a, ele)) {
-      list_a->metadata->_free(&data[offset_i]);
+      if (list_a->metadata->_free)
+      {
+        list_a->metadata->_free(&data[offset_i]);
+      }
       delete_shift(list, i);
       list_a->metadata->_length--;
       return EXIT_SUCCESS;
@@ -234,7 +245,10 @@ uint8_t c_vector_delete_ele_at_index(c_vector_h *list, const uint8_t index) {
 
   char *data = list_a->data;
   uint32_t offset = get_offset(list, index);
-  list_a->metadata->_free(&data[offset]);
+  if (list_a->metadata->_free)
+  {
+    list_a->metadata->_free(&data[offset]);
+  }
   delete_shift(list, index);
   list_a->metadata->_length--;
 
@@ -243,8 +257,15 @@ uint8_t c_vector_delete_ele_at_index(c_vector_h *list, const uint8_t index) {
 
 uint8_t c_vector_free(c_vector_h *list) {
   struct c_vector *list_a = list;
+  void* data_ptr = NULL;
   c_check_input_pointer(list_a, "vector pointer", EXIT_FAILURE);
-  c_vector_foreach(list_a, list_a->metadata->_free);
+  if (list_a->metadata->_free)
+  {
+    c_vector_foreach_new(list_a, data_ptr)
+    {
+      list_a->metadata->_free(data_ptr);
+    }
+  }
   free(list_a->metadata);
   free(list_a);
   return EXIT_SUCCESS;
@@ -270,7 +291,7 @@ uint8_t c_vector_capacity(const c_vector_h *list) {
   return list_a->metadata->_capacity;
 }
 
-uint8_t c_vector_ele_size(const c_vector_h *list) {
+EleSizeUnit_t c_vector_ele_size(const c_vector_h *list) {
   const struct c_vector *list_a = list;
   c_check_input_pointer(list_a, "vector pointer", EXIT_FAILURE);
 

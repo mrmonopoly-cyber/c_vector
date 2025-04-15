@@ -5,6 +5,7 @@
 
 /* Forward declaration of the vector handle */
 typedef void c_vector_h;
+typedef uint16_t EleSizeUnit_t;
 
 /* Function pointer types for customizing element operations */
 
@@ -52,7 +53,7 @@ enum C_VECTOR_ERRORS {
  */
 struct c_vector_input_init {
     uint8_t capacity;           /* Initial capacity of the vector */
-    uint8_t ele_size;           /* Size of each element in the vector */
+    EleSizeUnit_t ele_size;           /* Size of each element in the vector */
     comp_fun comp_fun;          /* Pointer to the comparison function, if NULL a bit by bit comparison will be used */
     print_ele print_fun;        /* Pointer to the function to print elements, if NULL c_vector_print will do nothing */
     free_ele free_fun;          /* Pointer to the function to free elements, only pass this function if you have nested pointer to free */
@@ -155,7 +156,7 @@ uint8_t c_vector_capacity(const c_vector_h *list);
  * @param list A pointer to the vector handle.
  * @return The size of elements in the vector (in bytes).
  */
-uint8_t c_vector_ele_size(const c_vector_h *list);
+EleSizeUnit_t c_vector_ele_size(const c_vector_h *list);
 
 /**
  * Clears all elements from the vector.
