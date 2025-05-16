@@ -135,7 +135,6 @@ static void *c_vector_give_new_position(c_vector_h * *list){
 // public
 c_vector_h *c_vector_init(const struct c_vector_input_init *input_args) {
   c_check_input_pointer(input_args, "input args init", NULL);
-  c_check_input_pointer(input_args->print_fun, "print_fun", NULL);
 
   uint16_t ele_size = input_args->ele_size;
   int capacity = input_args->capacity;
@@ -274,7 +273,10 @@ uint8_t c_vector_free(c_vector_h *list) {
 void c_vector_to_string(c_vector_h *list) {
   struct c_vector *list_a = list;
   c_check_input_pointer(list, "vector pointer", );
-  c_vector_foreach(list_a, list_a->metadata->_print);
+  if (list_a->metadata->_print)
+  {
+    c_vector_foreach(list_a, list_a->metadata->_print);
+  }
 }
 
 uint8_t c_vector_length(const c_vector_h *list) {
