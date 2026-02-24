@@ -16,14 +16,12 @@ void print_int(const void *a) { printf("%d\n", *(int *)a); }
 
 // Test the initialization of the vector
 void test_init() {
-  struct c_vector_input_init input_args = {0};
-  input_args.capacity = 5;
-  input_args.ele_size = sizeof(int);
-  input_args.free_fun = free_int;
-  input_args.print_fun = print_int;
-  input_args.comp_fun = compare_ints;
-
-  c_vector_h *vec = c_vector_init(&input_args);
+  c_vector_h *vec = c_vector_init(
+      .capacity = 5,
+      .ele_size = sizeof(int),
+      .free_fun = free_int,
+      .print_fun = print_int,
+      .comp_fun = compare_ints);
   if (vec == NULL) {
     printf("Initialization failed!\n");
     return;
@@ -35,14 +33,13 @@ void test_init() {
 
 // Test insertion and retrieval of elements
 void test_insert_and_get() {
-  struct c_vector_input_init input_args = {0};
-  input_args.capacity = 5;
-  input_args.ele_size = sizeof(int);
-  input_args.free_fun = free_int;
-  input_args.print_fun = print_int;
-  input_args.comp_fun = compare_ints;
-
-  c_vector_h *vec = c_vector_init(&input_args);
+  c_vector_h *vec = c_vector_init(
+      .capacity = 5,
+      .ele_size = sizeof(int),
+      .free_fun = free_int,
+      .print_fun = print_int,
+      .comp_fun = compare_ints,
+      );
 
   int value = 10;
   c_vector_push(&vec, &value);
@@ -59,14 +56,13 @@ void test_insert_and_get() {
 
 // Test deletion of elements
 void test_delete() {
-  struct c_vector_input_init input_args = {0};
-  input_args.capacity = 5;
-  input_args.ele_size = sizeof(int);
-  input_args.free_fun = free_int;
-  input_args.print_fun = print_int;
-  input_args.comp_fun = compare_ints;
-
-  c_vector_h *vec = c_vector_init(&input_args);
+  c_vector_h *vec = c_vector_init(
+      .capacity = 5,
+      .ele_size = sizeof(int),
+      .free_fun = free_int,
+      .print_fun = print_int,
+      .comp_fun = compare_ints,
+      );
 
   int value1 = 10, value2 = 20, value3 = 30;
   c_vector_push(&vec, &value1);
@@ -92,14 +88,12 @@ void test_delete() {
 
 // Test vector resizing
 void test_resize() {
-  struct c_vector_input_init input_args = {0};
-  input_args.capacity = 2;
-  input_args.ele_size = sizeof(int);
-  input_args.free_fun = free_int;
-  input_args.print_fun = print_int;
-  input_args.comp_fun = compare_ints;
-
-  c_vector_h *vec = c_vector_init(&input_args);
+  c_vector_h *vec = c_vector_init(
+      .capacity = 2,
+      .ele_size = sizeof(int),
+      .free_fun = free_int,
+      .print_fun = print_int,
+      .comp_fun = compare_ints);
 
   int value1 = 10, value2 = 20, value3 = 30;
   c_vector_push(&vec, &value1);
@@ -119,14 +113,13 @@ void test_resize() {
 
 // Test finding elements
 void test_find() {
-  struct c_vector_input_init input_args = {0};
-  input_args.capacity = 5;
-  input_args.ele_size = sizeof(int);
-  input_args.free_fun = free_int;
-  input_args.print_fun = print_int;
-  input_args.comp_fun = compare_ints;
-
-  c_vector_h *vec = c_vector_init(&input_args);
+  c_vector_h *vec = c_vector_init(
+      .capacity = 5,
+      .ele_size = sizeof(int),
+      .free_fun = free_int,
+      .print_fun = print_int,
+      .comp_fun = compare_ints,
+      );
 
   int value1 = 10, value2 = 20;
   c_vector_push(&vec, &value1);
@@ -144,14 +137,12 @@ void test_find() {
 
 // Test clearing the vector
 void test_clear() {
-  struct c_vector_input_init input_args = {0};
-  input_args.capacity = 5;
-  input_args.ele_size = sizeof(int);
-  input_args.free_fun = free_int;
-  input_args.print_fun = print_int;
-  input_args.comp_fun = compare_ints;
-
-  c_vector_h *vec = c_vector_init(&input_args);
+  c_vector_h *vec = c_vector_init(
+      .capacity =5,
+      .ele_size = sizeof(int),
+      .free_fun = free_int,
+      .comp_fun = compare_ints,
+      .print_fun = print_int);
 
   int value1 = 10, value2 = 20;
   c_vector_push(&vec, &value1);

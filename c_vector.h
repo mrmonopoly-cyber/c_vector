@@ -65,7 +65,9 @@ struct c_vector_input_init {
  * @param input_args A pointer to a struct defining initialization parameters.
  * @return A handle to the newly created vector, or NULL on failure.
  */
-c_vector_h *c_vector_init(const struct c_vector_input_init *input_args);
+c_vector_h *c_vector_init_(const struct c_vector_input_init input_args);
+
+#define c_vector_init(...) c_vector_init_((struct c_vector_input_init){__VA_ARGS__})
 
 /**
  * Frees the memory occupied by the vector and its elements.

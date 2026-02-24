@@ -133,11 +133,9 @@ static void *c_vector_give_new_position(c_vector_h * *list){
 }
 
 // public
-c_vector_h *c_vector_init(const struct c_vector_input_init *input_args) {
-  c_check_input_pointer(input_args, "input args init", NULL);
-
-  uint16_t ele_size = input_args->ele_size;
-  int capacity = input_args->capacity;
+c_vector_h *c_vector_init_(const struct c_vector_input_init input_args) {
+  uint16_t ele_size = input_args.ele_size;
+  int capacity = input_args.capacity;
   if (!ele_size) {
     fprintf(stderr, "FAILED: invalid element size, at least > 0, given %d\n",
             ele_size);
@@ -153,7 +151,7 @@ c_vector_h *c_vector_init(const struct c_vector_input_init *input_args) {
     return NULL;
   }
 
-  init_metadata(new_vector, input_args);
+  init_metadata(new_vector, &input_args);
 
   return new_vector;
 }
