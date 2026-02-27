@@ -14,9 +14,9 @@ typedef C_VECTOR_TEMPLATE(Obj) VectorObj;
 
 int main(void)
 {
-  VectorFloat vf = {0};
-  VectorObj vo = {0};
-  int i=0;
+  VectorFloat vf = C_VECTOR_INIT();
+  VectorObj vo = C_VECTOR_INIT();
+  size_t i=0;
 
   PUSH(vf, 2.f);
   PUSH(vf, 3.0f);
@@ -28,6 +28,9 @@ int main(void)
   for (i=0; i<LENGTH(vf); i++) {
     printf("%f\n", GET(vf,i));
   }
+
+  REMOVE_AT(vf, 1);
+  SHRINK_TO_FIT(vf);
 
   CLEAR(vf);
 

@@ -24,13 +24,13 @@ int main(void)
 
   PUSH(vo, ((Obj){.a = 1, .c = 'f', .d = 0.1f}));
 
-  for (int i=0; i<LENGTH(vf); i++) {
+  for (size_t i=0; i<LENGTH(vf); i++) {
     printf("%f\n", GET(vf,i));
   }
 
   CLEAR(vf);
 
-  for (int i=0; i<LENGTH(vf); i++) {
+  for (size_t i=0; i<LENGTH(vf); i++) {
     printf("%f\n", GET(vf,i));
   }
 

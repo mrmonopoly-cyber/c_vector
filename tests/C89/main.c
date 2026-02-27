@@ -1,3 +1,4 @@
+#include <stddef.h>
 #define C_VECTOR_NO_PREFIX
 #include "c_vector.h"
 #include <stdio.h>
@@ -16,7 +17,7 @@ int main(void)
 {
   VectorFloat vf = {0};
   VectorObj vo = {0};
-  int i=0;
+  size_t i=0;
 
   Obj o = {1,'f',0.1f};
 
