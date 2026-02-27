@@ -1,3 +1,5 @@
 main
 c_vector.o
 *so
+compile_commands.json
+.cache
