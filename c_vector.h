@@ -49,13 +49,17 @@
 
 #define _REALLOC_VEC(pp_data, capacity, ele_size, out)                                          \
   do{                                                                                           \
-    void* tmp = realloc((*pp_data), capacity * ele_size);                                       \
-    if (tmp) {                                                                                  \
-      *pp_data = tmp;                                                                           \
-      (out) = 1;                                                                                \
-    }else{                                                                                      \
+    if((capacity) > (SIZE_MAX / ele_size)){                                                     \
       (out) = 0;                                                                                \
-    }                                                                                           \
+    }else{                                                                                      \
+      void* tmp = realloc((*pp_data), capacity * ele_size);                                     \
+      if (tmp) {                                                                                \
+        *pp_data = tmp;                                                                         \
+        (out) = 1;                                                                              \
+      }else{                                                                                    \
+        (out) = 0;                                                                              \
+      }                                                                                         \
+    }\
   }while(0)
 
 #define C_VECTOR_RESERVE(self, CAPACITY)                                                        \
